@@ -41,7 +41,7 @@ async function run() {
             const result = await brandCollection.insertOne(newBrand);
             res.send(result);
         })
-     
+
         // get a specific brand
         app.get('/brands/:id', async (req, res) => {
             const id = req.params.id;
@@ -75,7 +75,30 @@ async function run() {
             const result = await productCollection.findOne(query);
             res.send(result);
         })
-        
+
+        // update product
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedProduct = req.body;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+
+            const product = {
+                $set: {
+                    productName: updatedProduct.productName,
+                    productImage: updatedProduct.productImage,
+                    brandName: updatedProduct.brandName,
+                    type: updatedProduct.type,
+                    price: updatedProduct.price,
+                    description: updatedProduct.description,
+                    rating: updatedProduct.rating
+                }
+            }
+
+            const result = await productCollection.updateOne(filter, product, options);
+            res.send(result);
+        })
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
